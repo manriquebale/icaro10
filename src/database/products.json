@@ -1,0 +1,23 @@
+[
+    {
+        "id": 2,
+        "name": "Buzz Lightyear",
+        "description": "Este juguete blabla",
+        "price": 4000,
+        "image": "juguete2.jpg"
+    },
+    {
+        "id": 3,
+        "name": "Jessi",
+        "description": "Este juguete blabla",
+        "price": 2000,
+        "image": "juguete3.jpg"
+    },
+    {
+        "id": 4,
+        "name": "Woody",
+        "description": "Este juguete blabla",
+        "price": "500",
+        "image": "juguete1.jpg"
+    }
+]
