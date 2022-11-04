@@ -1,101 +1,72 @@
 const { readProducts, readProduct, createProduct, productExists, deleteProduct, updateProduct } = require("../services/product")
 
-const getAllView = (req, res) => {
-    const products = readProducts();
-    return res.render('products', {products})
+const products = require('../../models').products
+const getAllView = async (req, res) => {
+
+    const productsNew = await products.findAll()
+    console.log(productsNew)
+    return res.render('products', {productsNew})
 }
 
 const getAll = (req, res) => {
-    const products = readProducts();
-
-    if (products.length <= 0) {
-        return res.status(500).json({
-            status: 'hubo un error',
-            message: 'no se encontraron productos'
-        })
-    }
-
-    return res.status(200).json(products)
+    return products.findAll()
+    .then(products => res.status(200).send(products))
+    .catch(error => res.status(404).send(error))
 
 }
 
 const getOne = (req, res) => {
     const { id } = req.params
-    const product = readProduct(id)
+    return products.findOne(
+        {   where: { id: id} })
+        
+    .then(products => res.status(200).send(products))
+    .catch(error => res.status(404).send(error))
 
-    if (!product) {
-        return res.status(500).json({
-            status: 'hubo un error',
-            message: 'no se encontraro el producto'
-        })
-    }
-
-    return res.status(200).json(product)
 }
 
 const create = (req, res) => {
     const { name, description, price, image } = req.body
-    const product = {
-        name,
-        description,
-        price,
-        image
-    }
-
-    createProduct(product)
-
-    return res.status(201).json({
-        status: 'exito',
-        message: 'el producto ha sido creado',
-        product
+    return products.create({
+        name: name, 
+        description: description,
+        price: price,
+        image: image
     })
-
+    .then(products => res.status(201).send(products))
+    .catch(error => res.status(500).send(error))
 }
 
 
-const update = (req, res) => {
+const update = async (req, res) => {
     const { id } = req.params
     const { name, description, price, image } = req.body
+    product = await products.findOne(
+        {   where: { id: id} })
+        
+    if (!product) return res.status(404).json({ error: 'no se encuentra'})
 
-    const product = {
-        name, description, price, image
-    }
-
-    if (!productExists(id)) {
-        return res.status(404).json({
-            status: 'hubno un error',
-            message: 'no se encontro el prod'
-        })
-    }
-
-    updateProduct(id, product)
-
-    return res.status(200).json({
-        status: "exito",
-        message: "se actualizo"
+    return products.update({ name: name, description: description, price: price, image: image},{
+        where: { id: id }
     })
-
+    .then(products => res.status(201).send(product))
+    .catch(error => res.status(500).send(error))
 
 }
 
 
-const deleteOne = (req, res) => {
+const deleteOne = async (req, res) => {
     const { id } = req.params
-    if (!productExists(id)) {
-        return res.status(404).json({
-            status: 'hubno un error',
-            message: 'no se encontro el prod'
-        })
-    }
-
-    deleteProduct(id)
-
-    return res.status(200).json({
-        status: "exito",
-        message: "se elimino"
+    product = await products.findOne(
+        {   where: { id: id} })
+        
+    if (!product) return res.status(404).json({ error: 'no se encuentra'})
+    
+    return products.destroy({
+        where: { id: id}
     })
-
-
+    .then(products => res.status(201).send(product))
+    .catch(error => res.status(500).send(error))
 }
 
 
